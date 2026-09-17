@@ -21,6 +21,7 @@
         packages = [
           # Tools
           pkgs.git
+          pkgs.gitflow
           pkgs.phpantom-lsp
           pkgs.fish
           pkgs.starship
