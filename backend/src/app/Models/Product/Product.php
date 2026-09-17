@@ -19,7 +19,7 @@ final class Product extends Model
         public string $image_url,
         string $id = ''
     ) {
-        parent::__contruct($id);
+        parent::__construct($id);
     }
 
     /**
