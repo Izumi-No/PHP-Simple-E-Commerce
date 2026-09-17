@@ -1,0 +1,26 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+      "dev": "parcel public/*.html",
+      "build": "parcel build public/*.html --dist-dir dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.20.0",
+  "devDependencies": {
+    "@types/alpinejs": "^3.13.11",
+    "parcel": "^2.16.4",
+    "parcel-resolver-path-alias": "^1.0.1",
+    "parcel-resolver-tspaths": "^0.0.9",
+    "postcss": "^8.5.28"
+  },
+  "dependencies": {
+    "@parcel/config-default": "^2.16.4",
+    "@tailwindcss/postcss": "^4.3.3",
+    "alpinejs": "^3.17.3",
+    "tailwindcss": "^4.3.3"
+  }
+}
