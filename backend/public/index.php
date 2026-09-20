@@ -2,7 +2,6 @@
 require_once __DIR__ . "/../vendor/autoload.php";
 
 use Izumi\Backend\app\Controllers\ProductsController;
-use Izumi\Backend\app\Repositories\Products\InMemoryProductsRepository;
 use Izumi\Backend\app\Repositories\Products\PostgresProductsRepository;
 use Izumi\Backend\app\Shared\Router;
 
@@ -12,7 +11,7 @@ $pdo = require __DIR__ . "/../src/app/Database/postgres.php";
 $repository = new PostgresProductsRepository($pdo);
 $productController = new ProductsController($repository);
 
-$routes = require __DIR__ . "/../src/app/Routes/Routes.php";
+$product_routes = require __DIR__ . "/../src/app/Routes/ProductsRoutes.php";
 
 $origin = $_SERVER["HTTP_ORIGIN"] ?? null;
 $allowedOrigins = ["http://localhost:1234", "http://localhost:5173"];
@@ -27,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
     exit();
 }
 
-$routes($router, $productController);
+$product_routes($router, $productController);
 
 $response = $router->dispatch(
     $_SERVER["REQUEST_METHOD"],
