@@ -1,0 +1,41 @@
+// Folder-specific settings
+//
+// For a full list of overridable settings, and general information on folder-specific settings,
+// see the documentation: https://zed.dev/docs/configuring-zed#settings-files
+{
+    "format_on_save": "on",
+    "lsp": {
+        "emmet-language-server": {
+            "initialization_options": {
+                "showSuggestionsAsSnippets": true,
+            },
+        },
+    },
+    "languages": {
+        "PHP": {
+            "language_servers": [
+                "phpantom",
+                "!intelephense",
+                "!phpactor",
+                "!phptools",
+            ],
+            "formatter": "language_server",
+        },
+        "JavaScript": {
+            "language_servers": ["biome"],
+            "formatter": {
+                "language_server": {
+                    "name": "biome",
+                },
+            },
+        },
+        "TypeScript": {
+            "language_servers": ["biome"],
+            "formatter": {
+                "language_server": {
+                    "name": "biome",
+                },
+            },
+        },
+    },
+}
