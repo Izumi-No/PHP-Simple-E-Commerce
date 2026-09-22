@@ -24,7 +24,7 @@ final class Product extends Model
 
     /**
      * Creates a new product from request data.
-     *
+     * @param array{name: string, price: float, description: string, quantity: int, image_url: string} $data
      * @return list<Error>|self
      */
     public static function create(array $data): array|self
@@ -57,6 +57,7 @@ final class Product extends Model
 
     /**
      * Reconstructs a product from persistent data.
+     * @param array{id: string, name: string, price: float, description: string, quantity: int, image_url: string} $data
      */
     public static function fromArray(array $data): self
     {
