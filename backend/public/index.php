@@ -3,6 +3,10 @@ require_once __DIR__ . "/../vendor/autoload.php";
 
 use Izumi\Backend\app\Controllers\ProductsController;
 use Izumi\Backend\app\Repositories\Products\PostgresProductsRepository;
+use Izumi\Backend\app\Shared\OpenAPI\OpenApiGenerator;
+use Izumi\Backend\app\Shared\OpenAPI\SwaggerUI;
+use Izumi\Backend\app\Shared\Request;
+use Izumi\Backend\app\Shared\Response;
 use Izumi\Backend\app\Shared\Router;
 
 $router = new Router();
@@ -27,6 +31,19 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 }
 
 $product_routes($router, $productController);
+
+$openApiGenerator = new OpenApiGenerator();
+
+$router->get("/openapi.json", function () use ($router, $openApiGenerator): Response {
+    return new Response($openApiGenerator->generate($router->routes()));
+});
+
+$path = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
+if ($path === "/docs") {
+    header("Content-Type: text/html; charset=utf-8");
+    echo SwaggerUI::html("/openapi.json");
+    exit();
+}
 
 $response = $router->dispatch(
     $_SERVER["REQUEST_METHOD"],

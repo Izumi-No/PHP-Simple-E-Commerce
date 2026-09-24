@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Izumi\Backend\app\Shared;
 
+use Izumi\Backend\app\Shared\Errors\Error;
+
 abstract class Model
 {
     public readonly string $id;

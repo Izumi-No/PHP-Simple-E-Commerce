@@ -6,7 +6,6 @@ namespace Tests\Unit\Products;
 use Izumi\Backend\app\Controllers\ProductsController;
 use Izumi\Backend\app\Repositories\Products\InMemoryProductsRepository;
 use Izumi\Backend\app\Shared\Request;
-use Izumi\Backend\app\Shared\Response;
 use PHPUnit\Framework\TestCase;
 
 final class ProductsControllerTest extends TestCase

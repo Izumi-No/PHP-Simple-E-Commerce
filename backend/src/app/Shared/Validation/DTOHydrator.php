@@ -4,7 +4,6 @@ namespace Izumi\Backend\app\Shared\Validation;
 
 use Izumi\Backend\app\Shared\DTO;
 use ReflectionClass;
-use ReflectionParameter;
 
 /**
  * @template T of DTO

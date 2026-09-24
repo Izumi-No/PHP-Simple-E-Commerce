@@ -4,7 +4,7 @@ namespace Izumi\Backend\app\Shared\OpenAPI;
 
 use Izumi\Backend\app\Shared\Attributes\ApiOperation;
 use Izumi\Backend\app\Shared\Attributes\ApiResponse;
-use Izumi\Backend\app\Shared\DTO;
+use ReflectionClass;
 use ReflectionMethod;
 
 final class OpenApiGenerator
@@ -17,16 +17,21 @@ final class OpenApiGenerator
      * @param list<array{
      *     method: string,
      *     path: string,
-     *     handler: array{0: object, 1: string}
+     *     handler: callable
      * }> $routes
      */
     public function generate(array $routes): array
     {
         $paths = [];
-        $components = [];
 
         foreach ($routes as $route) {
-            [$controller, $method] = $route['handler'];
+            $handler = $route['handler'];
+
+            if (!is_array($handler) || !isset($handler[0]) || !is_object($handler[0])) {
+                continue;
+            }
+
+            [$controller, $method] = $handler;
 
             $reflection = new ReflectionMethod($controller, $method);
 
@@ -46,15 +51,13 @@ final class OpenApiGenerator
                 $content = [];
 
                 if ($response->dto !== null) {
-                    $dto = $response->dto;
-
-                    $components[$dto] = $this->schemas->generate($dto);
+                    $this->schemas->generate($response->dto);
 
                     $content = [
                         'content' => [
                             'application/json' => [
                                 'schema' => [
-                                    '$ref' => '#/components/schemas/' . $dto,
+                                    '$ref' => '#/components/schemas/' . (new ReflectionClass($response->dto))->getShortName(),
                                 ],
                             ],
                         ],
@@ -70,9 +73,7 @@ final class OpenApiGenerator
             $requestBody = [];
 
             if ($operation->request !== null) {
-                $dto = $operation->request;
-
-                $components[$dto] = $this->schemas->generate($dto);
+                $this->schemas->generate($operation->request);
 
                 $requestBody = [
                     'requestBody' => [
@@ -80,7 +81,7 @@ final class OpenApiGenerator
                         'content' => [
                             'application/json' => [
                                 'schema' => [
-                                    '$ref' => '#/components/schemas/' . $dto,
+                                    '$ref' => '#/components/schemas/' . (new ReflectionClass($operation->request))->getShortName(),
                                 ],
                             ],
                         ],
@@ -104,17 +105,22 @@ final class OpenApiGenerator
             ],
             'paths' => (object) $paths,
             'components' => [
-                'schemas' => $this->namedSchemas($components),
+                'schemas' => (object) $this->namedSchemas($this->schemas->all()),
             ],
         ];
     }
 
+    /**
+     * @param array<class-string<\Izumi\Backend\app\Shared\DTO>, array<string, mixed>> $components
+     *
+     * @return array<string, array<string, mixed>>
+     */
     private function namedSchemas(array $components): array
     {
         $schemas = [];
 
         foreach ($components as $class => $schema) {
-            $schemas[new \ReflectionClass($class)->getShortName()] = $schema;
+            $schemas[(new ReflectionClass($class))->getShortName()] = $schema;
         }
 
         return $schemas;
