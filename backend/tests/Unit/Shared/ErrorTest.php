@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Shared;
 
-use Izumi\Backend\app\Shared\Error;
+use Izumi\Backend\app\Shared\Errors\Error;
 use PHPUnit\Framework\TestCase;
 
-use function Izumi\Backend\app\Shared\map_errors_to_arrays;
-
-final class TestError extends Error
+final readonly class TestError extends Error
 {
 }
 
@@ -18,29 +16,25 @@ final class ErrorTest extends TestCase
     public function testCreatesErrorWithProvidedValues(): void
     {
         $error = new TestError(
-            name: 'InvalidName',
+            code: 'InvalidName',
             message: 'Name cannot be empty',
-            code: 1,
         );
 
-        self::assertSame('InvalidName', $error->name);
+        self::assertSame('InvalidName', $error->code);
         self::assertSame('Name cannot be empty', $error->message);
-        self::assertSame(1, $error->code);
     }
 
     public function testToArrayReturnsErrorData(): void
     {
         $error = new TestError(
-            name: 'InvalidName',
+            code: 'InvalidName',
             message: 'Name cannot be empty',
-            code: 1,
         );
 
         self::assertSame(
             [
-                'name' => 'InvalidName',
+                'code' => 'InvalidName',
                 'message' => 'Name cannot be empty',
-                'code' => 1,
             ],
             $error->toArray(),
         );
@@ -50,36 +44,35 @@ final class ErrorTest extends TestCase
     {
         $errors = [
             new TestError(
-                name: 'InvalidName',
+                code: 'InvalidName',
                 message: 'Name cannot be empty',
-                code: 1,
             ),
             new TestError(
-                name: 'InvalidPrice',
+                code: 'InvalidPrice',
                 message: 'Price cannot be negative',
-                code: 2,
             ),
         ];
 
         self::assertSame(
             [
                 [
-                    'name' => 'InvalidName',
+                    'code' => 'InvalidName',
                     'message' => 'Name cannot be empty',
-                    'code' => 1,
                 ],
                 [
-                    'name' => 'InvalidPrice',
+                    'code' => 'InvalidPrice',
                     'message' => 'Price cannot be negative',
-                    'code' => 2,
                 ],
             ],
-            map_errors_to_arrays($errors),
+            array_map(
+                static fn (Error $error): array => $error->toArray(),
+                $errors
+            ),
         );
     }
 
     public function testMapErrorsToArraysReturnsEmptyArrayForEmptyInput(): void
     {
-        self::assertSame([], map_errors_to_arrays([]));
+        self::assertSame([], array_map(fn (Error $error): array => $error->toArray(), []));
     }
 }

@@ -5,44 +5,37 @@ declare(strict_types=1);
 namespace Tests\Unit\Shared;
 
 use Izumi\Backend\app\Shared\Controller;
+use Izumi\Backend\app\Shared\Errors\Error;
 use Izumi\Backend\app\Shared\Response;
 use PHPUnit\Framework\TestCase;
+
+final readonly class TestControllerError extends Error
+{
+}
 
 final class TestController extends Controller
 {
     public function makeResponse(
         mixed $data,
         int $status = 200,
-        array $headers = [],
     ): Response {
         return $this->response(
             data: $data,
             status: $status,
-            headers: $headers,
         );
+    }
+
+    public function makeError(Error $error, int $status): Response
+    {
+        return $this->error($error, $status);
     }
 }
 
 final class ControllerTest extends TestCase
 {
-    public function testStoresRepository(): void
-    {
-        $repository = new \stdClass();
-
-        $controller = new TestController($repository);
-
-        $reflection = new \ReflectionClass($controller);
-        $property = $reflection->getProperty('repository');
-
-        self::assertSame(
-            $repository,
-            $property->getValue($controller),
-        );
-    }
-
     public function testResponseUsesDefaultStatusAndHeaders(): void
     {
-        $controller = new TestController(new \stdClass());
+        $controller = new TestController();
 
         $response = $controller->makeResponse([
             'message' => 'OK',
@@ -63,7 +56,7 @@ final class ControllerTest extends TestCase
 
     public function testResponseUsesCustomStatus(): void
     {
-        $controller = new TestController(new \stdClass());
+        $controller = new TestController();
 
         $response = $controller->makeResponse(
             data: ['error' => 'Not Found'],
@@ -77,35 +70,27 @@ final class ControllerTest extends TestCase
         );
     }
 
-    public function testResponseUsesCustomHeaders(): void
+    public function testErrorReturnsErrorResponse(): void
     {
-        $controller = new TestController(new \stdClass());
+        $controller = new TestController();
 
-        $headers = [
-            'Content-Type' => 'text/plain',
-            'X-Custom-Header' => 'test',
-        ];
-
-        $response = $controller->makeResponse(
-            data: 'Hello',
-            headers: $headers,
+        $response = $controller->makeError(
+            new TestControllerError(
+                code: 'InvalidName',
+                message: 'Name cannot be empty',
+            ),
+            422,
         );
 
-        self::assertSame($headers, $response->headers);
-    }
-
-    public function testResponseUsesDefaultHeadersWhenEmptyHeadersAreProvided(): void
-    {
-        $controller = new TestController(new \stdClass());
-
-        $response = $controller->makeResponse(
-            data: [],
-            headers: [],
-        );
-
+        self::assertSame(422, $response->status);
         self::assertSame(
-            ['Content-Type' => 'application/json'],
-            $response->headers,
+            [
+                'error' => [
+                    'code' => 'InvalidName',
+                    'message' => 'Name cannot be empty',
+                ],
+            ],
+            $response->body,
         );
     }
 }

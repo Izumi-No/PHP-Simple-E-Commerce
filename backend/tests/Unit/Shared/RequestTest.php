@@ -117,6 +117,11 @@ final class RequestTest extends TestCase
             body: '[1,2,3]',
         );
 
-        self::assertIsArray($request->json());
+        $this->expectException(JsonException::class);
+        $this->expectExceptionMessage(
+            'Request body must contain a JSON object.'
+        );
+
+        $request->json();
     }
 }

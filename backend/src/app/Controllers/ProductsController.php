@@ -5,24 +5,20 @@ namespace Izumi\Backend\app\Controllers;
 use Izumi\Backend\app\Models\Product\Product;
 use Izumi\Backend\app\Repositories\Products\IProductsRepository;
 use Izumi\Backend\app\Shared\Controller;
+use Izumi\Backend\app\Shared\Errors\Error;
 use Izumi\Backend\app\Shared\Request;
 use Izumi\Backend\app\Shared\Response;
 use JsonException;
 
-use function Izumi\Backend\app\Shared\map_errors_to_arrays;
-
 final class ProductsController extends Controller
 {
-    public function __construct(IProductsRepository $repository)
-    {
-        parent::__construct($repository);
-    }
+    public function __construct(
+        private readonly IProductsRepository $repository,
+    ) {}
 
     public function create(Request $request): Response
     {
-        $body = $request->body;
-
-        if ($body === '') {
+        if ($request->body === '') {
             return $this->response(
                 ['error' => 'Request body is empty'],
                 400
@@ -30,12 +26,7 @@ final class ProductsController extends Controller
         }
 
         try {
-            $data = json_decode(
-                $body,
-                true,
-                512,
-                JSON_THROW_ON_ERROR
-            );
+            $data = $request->json();
         } catch (JsonException) {
             return $this->response(
                 ['error' => 'Invalid JSON format'],
@@ -47,7 +38,7 @@ final class ProductsController extends Controller
 
         if (is_array($product)) {
             return $this->response(
-                ['errors' => map_errors_to_arrays($product)],
+                ['errors' => self::mapErrors($product)],
                 422
             );
         }
@@ -103,7 +94,6 @@ final class ProductsController extends Controller
     public function update(Request $request): Response
     {
         $id = $request->params['id'] ?? '';
-        $body = $request->body;
 
         if ($id === '') {
             return $this->response(
@@ -112,7 +102,7 @@ final class ProductsController extends Controller
             );
         }
 
-        if ($body === '') {
+        if ($request->body === '') {
             return $this->response(
                 ['error' => 'Request body is empty'],
                 400
@@ -120,12 +110,7 @@ final class ProductsController extends Controller
         }
 
         try {
-            $data = json_decode(
-                $body,
-                true,
-                512,
-                JSON_THROW_ON_ERROR
-            );
+            $data = $request->json();
         } catch (JsonException) {
             return $this->response(
                 ['error' => 'Invalid JSON format'],
@@ -146,7 +131,7 @@ final class ProductsController extends Controller
 
         if ($errors !== []) {
             return $this->response(
-                ['errors' => map_errors_to_arrays($errors)],
+                ['errors' => self::mapErrors($errors)],
                 422
             );
         }
@@ -184,5 +169,18 @@ final class ProductsController extends Controller
         return $this->response([
             'message' => 'Product deleted successfully',
         ]);
+    }
+
+    /**
+     * @param list<Error> $errors
+     *
+     * @return list<array{code: string, message: string}>
+     */
+    private static function mapErrors(array $errors): array
+    {
+        return array_map(
+            static fn (Error $error): array => $error->toArray(),
+            $errors
+        );
     }
 }

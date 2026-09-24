@@ -2,12 +2,12 @@
 
 namespace Izumi\Backend\app\Models\Product;
 
-use Izumi\Backend\app\Shared\Error;
-use Izumi\Backend\app\Shared\Model;
 use Izumi\Backend\app\Models\Product\Errors\InvalidImageUrlError;
 use Izumi\Backend\app\Models\Product\Errors\InvalidNameError;
 use Izumi\Backend\app\Models\Product\Errors\InvalidPriceError;
 use Izumi\Backend\app\Models\Product\Errors\InvalidQuantityError;
+use Izumi\Backend\app\Shared\Errors\Error;
+use Izumi\Backend\app\Shared\Model;
 
 final class Product extends Model
 {
@@ -17,7 +17,7 @@ final class Product extends Model
         public string $description,
         public int $quantity,
         public string $image_url,
-        string $id = ''
+        string $id = '',
     ) {
         parent::__construct($id);
     }
@@ -35,24 +35,13 @@ final class Product extends Model
         $quantity = $data['quantity'] ?? 0;
         $imageUrl = $data['image_url'] ?? '';
 
-        $errors = self::validate(
-            $name,
-            $price,
-            $quantity,
-            $imageUrl
-        );
+        $errors = self::validate($name, $price, $quantity, $imageUrl);
 
         if ($errors !== []) {
             return $errors;
         }
 
-        return new self(
-            $name,
-            (float) $price,
-            $description,
-            $quantity,
-            $imageUrl
-        );
+        return new self($name, (float) $price, $description, $quantity, $imageUrl);
     }
 
     /**
@@ -67,7 +56,7 @@ final class Product extends Model
             $data['description'],
             (int) $data['quantity'],
             $data['image_url'],
-            $data['id']
+            $data['id'],
         );
     }
 
@@ -84,12 +73,7 @@ final class Product extends Model
         $quantity = $data['quantity'] ?? $this->quantity;
         $imageUrl = $data['image_url'] ?? $this->image_url;
 
-        $errors = self::validate(
-            $name,
-            $price,
-            $quantity,
-            $imageUrl
-        );
+        $errors = self::validate($name, $price, $quantity, $imageUrl);
 
         if ($errors !== []) {
             return $errors;
@@ -125,12 +109,8 @@ final class Product extends Model
      *
      * @return list<Error>
      */
-    private static function validate(
-        mixed $name,
-        mixed $price,
-        mixed $quantity,
-        mixed $imageUrl
-    ): array {
+    private static function validate(mixed $name, mixed $price, mixed $quantity, mixed $imageUrl): array
+    {
         $errors = [];
 
         if (!is_string($name) || trim($name) === '') {
@@ -145,27 +125,10 @@ final class Product extends Model
             $errors[] = new InvalidQuantityError();
         }
 
-        if (
-            !is_string($imageUrl) ||
-            !filter_var($imageUrl, FILTER_VALIDATE_URL)
-        ) {
+        if (!is_string($imageUrl) || !filter_var($imageUrl, FILTER_VALIDATE_URL)) {
             $errors[] = new InvalidImageUrlError();
         }
 
         return $errors;
     }
-
-}
-
-/**
- * @param array<Product> $products
- *
- * @return array<array<string, mixed>>
- */
-function map_products_to_arrays(array $products): array
-{
-    return array_map(
-        fn(Product $product) => $product->toArray(),
-        $products
-    );
 }

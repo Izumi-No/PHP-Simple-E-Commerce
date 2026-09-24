@@ -2,31 +2,18 @@
 
 namespace Izumi\Backend\app\Shared;
 
-/**
- * @template T
- */
+use Izumi\Backend\app\Shared\Errors\Error;
+use Izumi\Backend\app\Shared\Errors\ErrorResponse;
+
 abstract class Controller
 {
-    /** @var T */
-    protected $repository;
-
-    /** @param T $repository */
-    public function __construct($repository)
+    protected function response(mixed $data, int $status = 200): Response
     {
-        $this->repository = $repository;
+        return new Response($data, $status);
     }
 
-    protected function response(
-        mixed $data,
-        int $status = 200,
-        array $headers = []
-    ): Response {
-        return new Response(
-            body: $data,
-            status: $status,
-            headers: $headers ?: [
-                'Content-Type' => 'application/json',
-            ],
-        );
+    protected function error(Error $error, int $status): Response
+    {
+        return ErrorResponse::from(code: $error->code, message: $error->message, status: $status);
     }
 }
