@@ -102,7 +102,7 @@ final class RequestTest extends TestCase
         );
 
         $this->expectException(JsonException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionMessageIs(
             'Request body must contain a JSON object.'
         );
 
@@ -117,6 +117,11 @@ final class RequestTest extends TestCase
             body: '[1,2,3]',
         );
 
-        self::assertIsArray($request->json());
+        $this->expectException(JsonException::class);
+        $this->expectExceptionMessageIs(
+            'Request body must contain a JSON object.'
+        );
+
+        $request->json();
     }
 }

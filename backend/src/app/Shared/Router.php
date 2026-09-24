@@ -44,6 +44,12 @@ final class Router
         ];
     }
 
+    /** @return array<int, array{method: string, path: string, handler: callable}> */
+    public function routes(): array
+    {
+        return $this->routes;
+    }
+
     public function dispatch(
         string $method,
         string $uri

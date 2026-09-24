@@ -2,27 +2,33 @@
 
 namespace Izumi\Backend\app\Controllers;
 
+use Izumi\Backend\app\DTOs\Product\ProductItemResponseDTO;
+use Izumi\Backend\app\DTOs\Product\ProductCollectionResponseDTO;
+use Izumi\Backend\app\DTOs\Product\ProductRequestDTO;
 use Izumi\Backend\app\Models\Product\Product;
 use Izumi\Backend\app\Repositories\Products\IProductsRepository;
+use Izumi\Backend\app\Shared\Attributes\ApiOperation;
+use Izumi\Backend\app\Shared\Attributes\ApiResponse;
 use Izumi\Backend\app\Shared\Controller;
+use Izumi\Backend\app\Shared\Errors\Error;
+use Izumi\Backend\app\Shared\Errors\ValidationError;
 use Izumi\Backend\app\Shared\Request;
 use Izumi\Backend\app\Shared\Response;
 use JsonException;
 
-use function Izumi\Backend\app\Shared\map_errors_to_arrays;
-
 final class ProductsController extends Controller
 {
-    public function __construct(IProductsRepository $repository)
-    {
-        parent::__construct($repository);
-    }
+    public function __construct(
+        private readonly IProductsRepository $repository,
+    ) {}
 
+    #[ApiOperation(summary: 'Create a new product', request: ProductRequestDTO::class, tags: ['products'])]
+    #[ApiResponse(status: 201, description: 'Product created successfully', dto: ProductItemResponseDTO::class)]
+    #[ApiResponse(status: 400, description: 'Invalid request body')]
+    #[ApiResponse(status: 422, description: 'Invalid product data')]
     public function create(Request $request): Response
     {
-        $body = $request->body;
-
-        if ($body === '') {
+        if ($request->body === '') {
             return $this->response(
                 ['error' => 'Request body is empty'],
                 400
@@ -30,12 +36,7 @@ final class ProductsController extends Controller
         }
 
         try {
-            $data = json_decode(
-                $body,
-                true,
-                512,
-                JSON_THROW_ON_ERROR
-            );
+            $result = $request->validate(ProductRequestDTO::class);
         } catch (JsonException) {
             return $this->response(
                 ['error' => 'Invalid JSON format'],
@@ -43,11 +44,18 @@ final class ProductsController extends Controller
             );
         }
 
-        $product = Product::create($data);
+        if ($result->isInvalid()) {
+            return $this->response(
+                ['errors' => self::mapValidationErrors($result->errors)],
+                422
+            );
+        }
+
+        $product = Product::create($result->value()->toArray());
 
         if (is_array($product)) {
             return $this->response(
-                ['errors' => map_errors_to_arrays($product)],
+                ['errors' => self::mapErrors($product)],
                 422
             );
         }
@@ -63,6 +71,8 @@ final class ProductsController extends Controller
         );
     }
 
+    #[ApiOperation(summary: 'List all products', tags: ['products'])]
+    #[ApiResponse(status: 200, description: 'List of products', dto: ProductCollectionResponseDTO::class)]
     public function getAll(): Response
     {
         $products = $this->repository->findAll();
@@ -75,6 +85,10 @@ final class ProductsController extends Controller
         ]);
     }
 
+    #[ApiOperation(summary: 'Get a single product by id', tags: ['products'])]
+    #[ApiResponse(status: 200, description: 'Product found', dto: ProductItemResponseDTO::class)]
+    #[ApiResponse(status: 400, description: 'Product ID is required')]
+    #[ApiResponse(status: 404, description: 'Product not found')]
     public function getById(Request $request): Response
     {
         $id = $request->params['id'] ?? '';
@@ -100,10 +114,14 @@ final class ProductsController extends Controller
         ]);
     }
 
+    #[ApiOperation(summary: 'Update an existing product', request: ProductRequestDTO::class, tags: ['products'])]
+    #[ApiResponse(status: 200, description: 'Product updated successfully', dto: ProductItemResponseDTO::class)]
+    #[ApiResponse(status: 400, description: 'Invalid request body')]
+    #[ApiResponse(status: 404, description: 'Product not found')]
+    #[ApiResponse(status: 422, description: 'Invalid product data')]
     public function update(Request $request): Response
     {
         $id = $request->params['id'] ?? '';
-        $body = $request->body;
 
         if ($id === '') {
             return $this->response(
@@ -112,7 +130,7 @@ final class ProductsController extends Controller
             );
         }
 
-        if ($body === '') {
+        if ($request->body === '') {
             return $this->response(
                 ['error' => 'Request body is empty'],
                 400
@@ -120,12 +138,7 @@ final class ProductsController extends Controller
         }
 
         try {
-            $data = json_decode(
-                $body,
-                true,
-                512,
-                JSON_THROW_ON_ERROR
-            );
+            $data = $request->json();
         } catch (JsonException) {
             return $this->response(
                 ['error' => 'Invalid JSON format'],
@@ -146,7 +159,7 @@ final class ProductsController extends Controller
 
         if ($errors !== []) {
             return $this->response(
-                ['errors' => map_errors_to_arrays($errors)],
+                ['errors' => self::mapErrors($errors)],
                 422
             );
         }
@@ -159,6 +172,10 @@ final class ProductsController extends Controller
         ]);
     }
 
+    #[ApiOperation(summary: 'Delete a product', tags: ['products'])]
+    #[ApiResponse(status: 200, description: 'Product deleted successfully')]
+    #[ApiResponse(status: 400, description: 'Product ID is required')]
+    #[ApiResponse(status: 404, description: 'Product not found')]
     public function delete(Request $request): Response
     {
         $id = $request->params['id'] ?? '';
@@ -184,5 +201,31 @@ final class ProductsController extends Controller
         return $this->response([
             'message' => 'Product deleted successfully',
         ]);
+    }
+
+    /**
+     * @param list<Error> $errors
+     *
+     * @return list<array{code: string, message: string}>
+     */
+    private static function mapErrors(array $errors): array
+    {
+        return array_map(
+            static fn (Error $error): array => $error->toArray(),
+            $errors
+        );
+    }
+
+    /**
+     * @param list<ValidationError> $errors
+     *
+     * @return list<array{field: string, code: string, message: string}>
+     */
+    private static function mapValidationErrors(array $errors): array
+    {
+        return array_map(
+            static fn (ValidationError $error): array => $error->toArray(),
+            $errors
+        );
     }
 }

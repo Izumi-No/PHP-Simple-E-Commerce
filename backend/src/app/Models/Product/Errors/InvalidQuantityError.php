@@ -1,16 +1,16 @@
 <?php
-namespace Izumi\Backend\app\Models\Product\Errors;
-use Izumi\Backend\app\Shared\Error;
 
-final class InvalidQuantityError extends Error
+namespace Izumi\Backend\app\Models\Product\Errors;
+
+use Izumi\Backend\app\Shared\Errors\Error;
+
+final readonly class InvalidQuantityError extends Error
 {
     public function __construct()
     {
         parent::__construct(
-            'InvalidQuantity',
-            'Quantity cannot be negative',
-            3
+            code: 'InvalidQuantity',
+            message: 'Quantity cannot be negative',
         );
     }
 }
-?>

@@ -9,7 +9,7 @@ class ProductModelTest extends TestCase
 {
     private ?Product $product;
 
-    public function setUp()
+    public function setUp(): void
     {
         $product = Product::create(data: [
             "name" => "Test Product",
@@ -46,7 +46,7 @@ class ProductModelTest extends TestCase
         ]);
 
         $this->assertIsArray($product);
-        $this->assertContainsOnlyInstancesOf(\Izumi\Backend\app\Shared\Error::class, $product);
+        $this->assertContainsOnlyInstancesOf(\Izumi\Backend\app\Shared\Errors\Error::class, $product);
     }
 
     public function testProductReconstruction()

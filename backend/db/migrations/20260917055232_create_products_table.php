@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
+use Decimal\Decimal;
 use Phinx\Migration\AbstractMigration;
 
 final class CreateProductsTable extends AbstractMigration
 {
     public function change(): void
     {
-        $this->execute(
-            'CREATE EXTENSION IF NOT EXISTS pgcrypto'
-        );
+        $this->execute('CREATE EXTENSION IF NOT EXISTS pgcrypto');
 
-        $this->table('products', [
-            'id' => false,
-        ])
+        $this
+            ->table('products', [
+                'id' => false,
+            ])
             ->addColumn('id', 'uuid', [
                 'null' => false,
             ])
@@ -50,14 +50,10 @@ final class CreateProductsTable extends AbstractMigration
             ])
             ->create();
 
-        $this->execute(
-            'ALTER TABLE products
-             ALTER COLUMN id SET DEFAULT gen_random_uuid()'
-        );
+        $this->execute('ALTER TABLE products
+             ALTER COLUMN id SET DEFAULT gen_random_uuid()');
 
-        $this->execute(
-            'ALTER TABLE products
-             ADD PRIMARY KEY (id)'
-        );
+        $this->execute('ALTER TABLE products
+             ADD PRIMARY KEY (id)');
     }
 }
