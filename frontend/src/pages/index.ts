@@ -1,12 +1,29 @@
-import Alpine from 'alpinejs'
+import "../presentation/components/index";
+import { cartService, productService, theme } from "../composition";
+import { toast } from "../presentation/components/ui/toast/index";
+import { startAlpine } from "../presentation/lib/alpine";
+import "./home";
 
-window.Alpine = Alpine;
-
-Alpine.start()
-
-async function main(){
-const response = await fetch("http://localhost:8000/products");
-const products = await response.json();
-console.log(products);
+function bootstrap(): void {
+	startAlpine();
 }
-main();
+
+if (document.readyState === "loading") {
+	document.addEventListener("DOMContentLoaded", bootstrap, { once: true });
+} else {
+	bootstrap();
+}
+
+declare global {
+	interface Window {
+		toast: typeof toast;
+		theme: typeof theme;
+		productService: typeof productService;
+		cartService: typeof cartService;
+	}
+}
+
+window.toast = toast;
+window.theme = theme;
+window.productService = productService;
+window.cartService = cartService;
