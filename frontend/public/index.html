@@ -1,15 +1,404 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Indice</title>
-	<link rel="stylesheet" href="../styles/index.css">
-	<script type="module" src="../src/pages/index.ts"></script>
-</head>
-<body>
-    <div class="h-screen w-screen bg-indigo-800 flex items-center justify-center">
-        <div class="h-8 w-18 bg-indigo-600"></div>
-    </div>
-</body>
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Doceiro — mercado de colecionáveis fofos</title>
+        <link rel="stylesheet" href="../styles/index.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,600;1,700&family=Quicksand:wght@400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <script type="module" src="../src/pages/index.ts"></script>
+    </head>
+    <body class="min-h-screen bg-background">
+        <!-- Yangyang pelo topo ---------------------------------------- -->
+        <header
+            class="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur-xl"
+        >
+            <div class="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
+                <a href="/" class="flex items-center gap-2">
+                    <span
+                        class="grid size-9 place-items-center rounded-full bg-primary text-primary-foreground shadow-sm"
+                        ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            width="16"
+                            height="16"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            ><path
+                                d="M12 7C10.5 4.5 8 3 5.5 3 3 3 1.5 5 1.5 7.5c0 3 3.5 4 6 4.5L12 7ZM12 7c1.5-2.5 4-4 6.5-4C21 3 22.5 5 22.5 7.5c0 3-3.5 4-6 4.5L12 7Z"
+                            /><circle cx="12" cy="12" r="2.5" /></svg
+                        ></span
+                    >
+                    <span class="title-serif text-lg font-semibold">Doceiro</span>
+                </a>
+
+                <nav class="hidden items-center gap-1 md:flex">
+                    <z-button variant="ghost" size="sm">Figuras</z-button>
+                    <z-button variant="ghost" size="sm">Chaveiros</z-button>
+                    <z-button variant="ghost" size="sm">Adesivos</z-button>
+                    <z-button variant="ghost" size="sm">Plush</z-button>
+                </nav>
+
+                <div class="ml-auto flex items-center gap-2">
+                    <z-theme-toggle></z-theme-toggle>
+                    <z-tooltip content="Favoritos">
+                        <button
+                            type="button"
+                            class="grid size-9 place-items-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:text-primary"
+                            aria-label="Favoritos"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                width="16"
+                                height="16"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path
+                                    d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
+                                />
+                            </svg>
+                        </button>
+                    </z-tooltip>
+
+                    <button
+                        type="button"
+                        class="relative grid size-9 place-items-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:text-primary"
+                        @click="document.getElementById('carrinho').show()"
+                        aria-label="Abrir carrinho"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            width="16"
+                            height="16"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <circle cx="8" cy="21" r="1" />
+                            <circle cx="19" cy="21" r="1" />
+                            <path
+                                d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"
+                            />
+                        </svg>
+                        <span
+                            class="absolute -top-1 -right-1 grid size-5 place-items-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground"
+                            x-data
+                            x-text="$store.cart.count"
+                            >0</span
+                        >
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero ------------------------------------------------------ -->
+        <section class="coquette-hero border-b border-border/60">
+            <div class="mx-auto max-w-7xl px-4 py-16 sm:py-24">
+                <div class="max-w-xl space-y-6">
+                    <div class="flex gap-2">
+                        <z-badge variant="secondary">novo</z-badge>
+                        <z-badge>coleção pastel</z-badge>
+                    </div>
+                    <h1 class="title-serif text-5xl leading-tight font-semibold sm:text-6xl">
+                        colecionáveis tão fofinhos que você vai querer abraçar
+                        a página inteira
+                    </h1>
+                    <p class="text-lg text-muted-foreground">
+                        bonecos, art toys, chaveiros e plush feitos à mão, com
+                        frete grátis acima de R$ 199.
+                    </p>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <z-button size="lg">Explorar coleção</z-button>
+                        <z-button variant="outline" size="lg"
+                            >Lembranças vintage</z-button
+                        >
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filtros ---------------------------------------------------->
+        <div class="mx-auto max-w-7xl px-4 pt-8" x-data="{ query: '' }">
+            <div class="mb-6 flex flex-wrap items-center gap-3">
+                <div class="relative w-full max-w-xs">
+                    <span
+                        class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            width="16"
+                            height="16"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="m21 21-4.3-4.3" />
+                        </svg>
+                    </span>
+                    <z-input
+                        id="products-search"
+                        placeholder="procurar algo bonitinho..."
+                        x-model="query"
+                        class="pl-9 rounded-full"
+                    ></z-input>
+                </div>
+
+                <z-select placeholder="todas as categorias" class="w-56">
+                    <option value="figuras">figuras</option>
+                    <option value="chaveiros">chaveiros</option>
+                    <option value="plush">plush</option>
+                    <option value="adesivos">adesivos</option>
+                </z-select>
+
+                <z-dropdown trigger="ordenar por">
+                    <z-dropdown-label>ordenação</z-dropdown-label>
+                    <z-dropdown-item>mais amados</z-dropdown-item>
+                    <z-dropdown-item>menor preço</z-dropdown-item>
+                    <z-dropdown-item>maior preço</z-dropdown-item>
+                    <z-dropdown-separator></z-dropdown-separator>
+                    <z-dropdown-item>recém-chegados</z-dropdown-item>
+                </z-dropdown>
+
+                <z-button variant="ghost" size="sm">limpar filtros</z-button>
+            </div>
+
+            <!-- Grid de produtos ------------------------------------->
+            <section
+                id="products-grid"
+                class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4"
+            >
+                <div class="col-span-full grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 pb-12">
+                    <template x-for="i in 4"><z-skeleton class="aspect-square rounded-2xl"></z-skeleton></template>
+                </div>
+            </section>
+
+            <div class="mt-8 flex justify-center">
+                <z-pagination total="64" per-page="12" page="1"></z-pagination>
+            </div>
+
+            <!-- Lançamentos ------------------------------------------>
+            <section class="pt-16">
+                <div class="mb-4 flex items-end justify-between">
+                    <div>
+                        <h2 class="title-serif text-2xl font-semibold">
+                            recém-chegados 💌
+                        </h2>
+                        <p class="text-sm text-muted-foreground">
+                            as peças mais fresquinhas da loja
+                        </p>
+                    </div>
+                    <z-button variant="link" size="sm">ver todos →</z-button>
+                </div>
+                <div class="grid gap-6 md:grid-cols-2">
+                    <z-card>
+                        <z-card-header>
+                            <z-card-title>por que colecionar com a gente?</z-card-title>
+                            <z-card-description
+                                >um abraço em cada envio</z-card-description
+                            >
+                        </z-card-header>
+                        <z-card-content class="flex flex-col gap-4">
+                            <div class="flex items-start gap-3">
+                                <div class="grid size-9 shrink-0 place-items-center rounded-full bg-secondary text-secondary-foreground">
+                                    ✿
+                                </div>
+                                <div>
+                                    <p class="font-medium">compromisso com o artesanal</p>
+                                    <p class="text-sm text-muted-foreground">
+                                        cada peça é pintada à mão com pinceladas
+                                        bem visíveis — nada de fábrica
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="grid size-9 shrink-0 place-items-center rounded-full bg-accent text-accent-foreground">
+                                    ♡
+                                </div>
+                                <div>
+                                    <p class="font-medium">embalagem-presencial</p>
+                                    <p class="text-sm text-muted-foreground">
+                                        caixinhas com laço, cartão de gratidão
+                                        e adesivo surpresa
+                                    </p>
+                                </div>
+                            </div>
+                            <z-tabs value="cuidado">
+                                <z-tab value="cuidado" label="cuidado">
+                                    <p class="text-sm text-muted-foreground">
+                                        lave à mão com água fria e amor.
+                                    </p>
+                                </z-tab>
+                                <z-tab value="trocas" label="trocas">
+                                    <p class="text-sm text-muted-foreground">
+                                        30 dias para trocas, sem estresse.
+                                    </p>
+                                </z-tab>
+                            </z-tabs>
+                        </z-card-content>
+                    </z-card>
+
+                    <z-card>
+                        <z-card-header>
+                            <z-card-title>monte sua lista de desejos</z-card-title>
+                            <z-card-description
+                                >deixe suas preferências salvas</z-card-description
+                            >
+                        </z-card-header>
+                        <z-card-content
+                            class="flex flex-col gap-4"
+                            x-data="{ name:'', email:'', soft:true, secret:false, theme:'rosa' }"
+                        >
+                            <div class="grid gap-2">
+                                <z-label for="nm">seu apelido mais bonito</z-label>
+                                <z-input id="nm" placeholder="anita" x-model="name"></z-input>
+                            </div>
+                            <div class="grid gap-2">
+                                <z-label for="em">e-mail</z-label>
+                                <z-input id="em" type="email" placeholder="anita@doceiro.art" x-model="email"></z-input>
+                            </div>
+                            <div class="grid gap-2">
+                                <z-label>cor favorita da coleção</z-label>
+                                <z-radio-group x-model="theme">
+                                    <z-radio value="rosa">rosa baby</z-radio>
+                                    <z-radio value="lilas">lilás</z-radio>
+                                    <z-radio value="verde">verde menta</z-radio>
+                                </z-radio-group>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <z-label>quero relembrar promoções</z-label>
+                                <z-switch x-model="soft"></z-switch>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <z-checkbox x-model="secret"></z-checkbox>
+                                <z-label>Manter escondido as likes exóticas</z-label>
+                            </div>
+                            <z-progress value="72"></z-progress>
+                            <z-button
+                                class="mt-2"
+                                @click="window.toast({ title:'lista salva!', description:'avise a gente quando quiser atualizar ✨', variant:'success' })"
+                                >salvar lista</z-button
+                            >
+                        </z-card-content>
+                    </z-card>
+                </div>
+            </section>
+
+            <!-- Seção vazio ------------------------------------------->
+            <section class="pt-16">
+                <z-empty-state
+                    icon="gift"
+                    title="também falta algo em seu coração?"
+                    description="abrir uma caixinha nova é quase uma terapia"
+                >
+                    <z-button variant="outline" size="sm">lembrar depois</z-button>
+                    <z-button size="sm">novidade mais bonita</z-button>
+                </z-empty-state>
+            </section>
+
+            <div class="h-24"></div>
+        </div>
+
+        <!-- Carrinho (sheet lateral) ----------------------------------->
+        <z-sheet id="carrinho" side="right">
+            <div class="flex items-center justify-between">
+                <h2 class="font-medium">seu carrinho</h2>
+                <z-badge variant="secondary">
+                    <span x-text="$store.cart.count"></span> itens
+                </z-badge>
+            </div>
+
+            <template x-if="$store.cart.items.length === 0">
+                <z-empty-state
+                    icon="shopping-cart"
+                    title="carrinho vazio"
+                    description="uma caixinha cheia de amor é só o começo ✨"
+                >
+                    <z-button variant="outline" size="sm"
+                        >escolher algo</z-button
+                    >
+                </z-empty-state>
+            </template>
+
+            <div class="flex flex-col gap-3">
+                <template x-for="item in $store.cart.items" :key="item.id">
+                    <div class="flex items-center gap-3 border-b pb-3">
+                        <img
+                            :src="item.image"
+                            :alt="item.name"
+                            class="size-14 rounded-2xl object-cover ring-1 ring-border"
+                        />
+                        <div class="flex-1 min-w-0">
+                            <p class="line-clamp-1 text-sm font-medium" x-text="item.name"></p>
+                            <p class="text-xs text-muted-foreground">1x</p>
+                        </div>
+                        <z-quantity-input
+                            :value="item.quantity"
+                            @change="$store.cart.setQuantity(item.id, $event.detail.value)"
+                        ></z-quantity-input>
+                        <button
+                            type="button"
+                            class="text-muted-foreground transition-colors hover:text-destructive"
+                            @click="$store.cart.remove(item.id)"
+                            aria-label="Remover"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                width="16"
+                                height="16"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path d="M3 6h18" />
+                                <path
+                                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
+                                />
+                                <path
+                                    d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                </template>
+            </div>
+
+            <div class="mt-auto space-y-3 border-t pt-4">
+                <div class="flex items-center justify-between text-sm text-muted-foreground">
+                    <span>subtotal</span>
+                    <span x-text="new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format($store.cart.subtotal)"></span>
+                </div>
+                <z-button
+                    class="w-full"
+                    @click="window.toast({ title:'pedido criado!', description:'sua caixinha será embalada com muito carinho ✨', variant:'success'})"
+                >
+                    finalizar compra
+                </z-button>
+            </div>
+        </z-sheet>
+
+        <z-toaster></z-toaster>
+    </body>
 </html>

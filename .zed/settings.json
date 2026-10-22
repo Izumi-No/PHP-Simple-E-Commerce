@@ -22,7 +22,7 @@
             "formatter": "language_server",
         },
         "JavaScript": {
-            "language_servers": ["biome"],
+            "language_servers": ["typescript-language-server", "biome"],
             "formatter": {
                 "language_server": {
                     "name": "biome",
@@ -30,7 +30,7 @@
             },
         },
         "TypeScript": {
-            "language_servers": ["biome"],
+            "language_servers": ["typescript-language-server", "biome"],
             "formatter": {
                 "language_server": {
                     "name": "biome",
