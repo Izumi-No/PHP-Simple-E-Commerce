@@ -2,8 +2,14 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use Izumi\Backend\app\Controllers\Auth\AuthController;
 use Izumi\Backend\app\Controllers\ProductsController;
 use Izumi\Backend\app\Repositories\Products\PostgresProductsRepository;
+use Izumi\Backend\app\Repositories\Sessions\PostgresSessionsRepository;
+use Izumi\Backend\app\Repositories\TempUsers\PostgresTempUsersRepository;
+use Izumi\Backend\app\Repositories\UserIdentities\PostgresUserIdentitiesRepository;
+use Izumi\Backend\app\Repositories\Users\PostgresUsersRepository;
+use Izumi\Backend\app\Shared\Auth\SessionResolver;
 use Izumi\Backend\app\Shared\OpenAPI\OpenApiGenerator;
 use Izumi\Backend\app\Shared\OpenAPI\SwaggerUI;
 use Izumi\Backend\app\Shared\Request;
@@ -13,10 +19,27 @@ use Izumi\Backend\app\Shared\Router;
 $router = new Router();
 
 $pdo = require __DIR__ . '/../src/app/Database/postgres.php';
-$repository = new PostgresProductsRepository($pdo);
-$productController = new ProductsController($repository);
+
+// Product dependencies
+$productRepository = new PostgresProductsRepository($pdo);
+$productController = new ProductsController($productRepository);
+
+// Auth dependencies
+$usersRepository = new PostgresUsersRepository($pdo);
+$identitiesRepository = new PostgresUserIdentitiesRepository($pdo);
+$sessionsRepository = new PostgresSessionsRepository($pdo);
+$tempUsersRepository = new PostgresTempUsersRepository($pdo);
+$sessionResolver = new SessionResolver($sessionsRepository, $usersRepository);
+$authController = new AuthController(
+    $usersRepository,
+    $identitiesRepository,
+    $sessionsRepository,
+    $tempUsersRepository,
+    $sessionResolver,
+);
 
 $product_routes = require __DIR__ . '/../src/app/Routes/ProductsRoutes.php';
+$auth_routes = require __DIR__ . '/../src/app/Routes/AuthRoutes.php';
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? null;
 $allowedOrigins = ['*'];
@@ -32,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 $product_routes($router, $productController);
+$auth_routes($router, $authController);
 
 $openApiGenerator = new OpenApiGenerator();
 
