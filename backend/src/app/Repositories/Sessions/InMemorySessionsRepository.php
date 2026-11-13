@@ -20,6 +20,12 @@ final class InMemorySessionsRepository implements ISessionsRepository
         return $this->sessions[$id] ?? null;
     }
 
+    /** @return array<Session> */
+    public function findAll(): array
+    {
+        return array_values($this->sessions);
+    }
+
     public function delete(string $id): void
     {
         unset($this->sessions[$id]);

@@ -10,6 +10,9 @@ interface ITempUsersRepository
 
     public function findById(string $id): ?TempUser;
 
+    /** @return array<TempUser> */
+    public function findAll(): array;
+
     public function findByEmail(string $email): ?TempUser;
 
     public function delete(string $id): void;

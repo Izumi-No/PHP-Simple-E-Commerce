@@ -20,6 +20,12 @@ final class InMemoryTempUsersRepository implements ITempUsersRepository
         return $this->tempUsers[$id] ?? null;
     }
 
+    /** @return array<TempUser> */
+    public function findAll(): array
+    {
+        return array_values($this->tempUsers);
+    }
+
     public function findByEmail(string $email): ?TempUser
     {
         foreach ($this->tempUsers as $tempUser) {

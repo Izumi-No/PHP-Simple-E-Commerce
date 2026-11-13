@@ -46,6 +46,16 @@ final class PostgresSessionsRepository implements ISessionsRepository
         return Session::fromArray($row);
     }
 
+    /** @return array<Session> */
+    public function findAll(): array
+    {
+        $stmt = $this->pdo->query(
+            'SELECT * FROM sessions WHERE deleted_at IS NULL AND expiration > CURRENT_TIMESTAMP ORDER BY created_at DESC',
+        );
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return array_map(fn(array $row): Session => Session::fromArray($row), $rows);
+    }
+
     public function delete(string $id): void
     {
         $stmt = $this->pdo->prepare(

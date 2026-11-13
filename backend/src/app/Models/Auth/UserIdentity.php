@@ -36,10 +36,14 @@ final class UserIdentity extends Model
 
         $provider = self::resolveProvider($providerRaw);
 
+        if ($provider instanceof InvalidProviderError) {
+            return [$provider];
+        }
+
         $errors = self::validate($provider, $providerSubject, $email, $passwordHash);
 
-        if (is_string($provider) || $errors !== []) {
-            return $errors !== [] ? $errors : [$provider];
+        if ($errors !== []) {
+            return $errors;
         }
 
         return new self($user, $provider, $providerSubject, $email, $passwordHash);
@@ -65,7 +69,13 @@ final class UserIdentity extends Model
      */
     public function update(array $data): array
     {
-        $provider = $data['provider'] ?? $this->provider;
+        $providerRaw = $data['provider'] ?? $this->provider->value;
+        $provider = self::resolveProvider($providerRaw);
+
+        if ($provider instanceof InvalidProviderError) {
+            return [$provider];
+        }
+
         $providerSubject = $data['provider_subject'] ?? $this->provider_subject;
         $email = $data['email'] ?? $this->email;
         $passwordHash = $data['password_hash'] ?? $this->password_hash;

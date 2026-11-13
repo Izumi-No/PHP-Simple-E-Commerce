@@ -10,6 +10,9 @@ interface ISessionsRepository
 
     public function findById(string $id): ?Session;
 
+    /** @return array<Session> */
+    public function findAll(): array;
+
     public function delete(string $id): void;
 
     public function cleanupExpired(): int;

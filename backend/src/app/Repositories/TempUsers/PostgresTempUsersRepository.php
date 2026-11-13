@@ -46,6 +46,14 @@ final class PostgresTempUsersRepository implements ITempUsersRepository
         return TempUser::fromArray($row);
     }
 
+    /** @return array<TempUser> */
+    public function findAll(): array
+    {
+        $stmt = $this->pdo->query('SELECT * FROM temp_users WHERE deleted_at IS NULL ORDER BY created_at DESC');
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return array_map(fn(array $row): TempUser => TempUser::fromArray($row), $rows);
+    }
+
     public function findByEmail(string $email): ?TempUser
     {
         $stmt = $this->pdo->prepare(
