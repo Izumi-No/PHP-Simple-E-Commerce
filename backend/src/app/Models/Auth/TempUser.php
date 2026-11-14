@@ -27,7 +27,7 @@ final class TempUser extends Model
         $passwordHash = $data['password_hash'] ?? '';
         $expiration = $data['expiration'] ?? '';
 
-        $errors = self::validate($email);
+        $errors = self::validate($email, $passwordHash, $expiration);
 
         if ($errors !== []) {
             return $errors;
@@ -70,12 +70,26 @@ final class TempUser extends Model
     /**
      * @return list<Error>
      */
-    private static function validate(mixed $email): array
+    private static function validate(mixed $email, mixed $passwordHash, mixed $expiration): array
     {
         $errors = [];
 
         if (!is_string($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors[] = new InvalidEmailError();
+        }
+
+        if (!is_string($passwordHash) || $passwordHash === '') {
+            $errors[] = new Error('MissingPasswordHash', 'Password hash is required');
+        }
+
+        if (!is_string($expiration) || $expiration === '') {
+            $errors[] = new Error('MissingExpiration', 'Expiration is required');
+        } else {
+            try {
+                new \DateTimeImmutable($expiration);
+            } catch (\Exception) {
+                $errors[] = new Error('InvalidExpiration', 'Expiration must be a valid datetime string');
+            }
         }
 
         return $errors;

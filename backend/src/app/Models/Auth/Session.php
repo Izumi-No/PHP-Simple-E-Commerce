@@ -16,10 +16,9 @@ final class Session extends Model
     }
 
     /**
-     * @param array{user: string, expiration: string, created_at: string} $data
-     * @return list<\Izumi\Backend\app\Shared\Errors\Error>|self
+     * @param array{user: string, expiration: string, created_at?: string} $data
      */
-    public static function create(array $data): array|self
+    public static function create(array $data): self
     {
         return new self(
             $data['user'],

@@ -39,7 +39,8 @@ final class AuthController extends Controller
     ) {}
 
     /**
-     * @param array{code: string, message: string} $data
+     * @param array<string, mixed> $data
+     * @param array<string, string> $headers
      */
     protected function response(mixed $data, int $status = 200, array $headers = []): Response
     {
