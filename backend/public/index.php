@@ -2,9 +2,7 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use Izumi\Backend\app\Controllers\ProductsController;
 use Izumi\Backend\app\Controllers\Shops\ShopsController;
-use Izumi\Backend\app\Repositories\Products\PostgresProductsRepository;
 use Izumi\Backend\app\Repositories\Sessions\PostgresSessionsRepository;
 use Izumi\Backend\app\Repositories\Shops\PostgresShopsRepository;
 use Izumi\Backend\app\Repositories\Tags\PostgresTagsRepository;
@@ -21,10 +19,6 @@ use Izumi\Backend\app\Shared\Router;
 $router = new Router();
 
 $pdo = require __DIR__ . '/../src/app/Database/postgres.php';
-
-// Product dependencies
-$productRepository = new PostgresProductsRepository($pdo);
-$productController = new ProductsController($productRepository);
 
 // Auth dependencies
 $usersRepository = new PostgresUsersRepository($pdo);
@@ -45,7 +39,6 @@ $shopsRepository = new PostgresShopsRepository($pdo);
 $tagsRepository = new PostgresTagsRepository($pdo);
 $shopsController = new ShopsController($shopsRepository, $tagsRepository, $sessionResolver);
 
-$product_routes = require __DIR__ . '/../src/app/Routes/ProductsRoutes.php';
 $auth_routes = require __DIR__ . '/../src/app/Routes/AuthRoutes.php';
 $shops_routes = require __DIR__ . '/../src/app/Routes/ShopsRoutes.php';
 
@@ -62,7 +55,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-$product_routes($router, $productController);
 $auth_routes($router, $authController);
 $shops_routes($router, $shopsController);
 
