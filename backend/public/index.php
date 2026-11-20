@@ -2,8 +2,12 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use Izumi\Backend\app\Controllers\Auth\AuthController;
+use Izumi\Backend\app\Controllers\Collectables\CollectablesController;
 use Izumi\Backend\app\Controllers\ProductsController;
 use Izumi\Backend\app\Controllers\Shops\ShopsController;
+use Izumi\Backend\app\Repositories\Collectables\PostgresCollectablesRepository;
+use Izumi\Backend\app\Repositories\CollectableTags\PostgresCollectableTagsRepository;
 use Izumi\Backend\app\Repositories\Products\PostgresProductsRepository;
 use Izumi\Backend\app\Repositories\Sessions\PostgresSessionsRepository;
 use Izumi\Backend\app\Repositories\Shops\PostgresShopsRepository;
@@ -45,9 +49,21 @@ $shopsRepository = new PostgresShopsRepository($pdo);
 $tagsRepository = new PostgresTagsRepository($pdo);
 $shopsController = new ShopsController($shopsRepository, $tagsRepository, $sessionResolver);
 
+// Collectables and Collectable Tags dependencies
+$collectablesRepository = new PostgresCollectablesRepository($pdo);
+$collectableTagsRepository = new PostgresCollectableTagsRepository($pdo);
+$collectablesController = new CollectablesController(
+    $collectablesRepository,
+    $collectableTagsRepository,
+    $shopsRepository,
+    $tagsRepository,
+    $sessionResolver,
+);
+
 $product_routes = require __DIR__ . '/../src/app/Routes/ProductsRoutes.php';
 $auth_routes = require __DIR__ . '/../src/app/Routes/AuthRoutes.php';
 $shops_routes = require __DIR__ . '/../src/app/Routes/ShopsRoutes.php';
+$collectables_routes = require __DIR__ . '/../src/app/Routes/CollectablesRoutes.php';
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? null;
 $allowedOrigins = ['*'];
@@ -65,6 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $product_routes($router, $productController);
 $auth_routes($router, $authController);
 $shops_routes($router, $shopsController);
+$collectables_routes($router, $collectablesController);
 
 $openApiGenerator = new OpenApiGenerator();
 
